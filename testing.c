@@ -4,10 +4,9 @@
 #define NULL ((void *)0)
 
 int main(int argc, char *argv[]){
-  int a, b;
+  int a = 5;
+  int b = 6;
   int *pi;
-  a = 5;
-  b = 6;
   pi = &a;
   a = *pi;
   pi = NULL;
