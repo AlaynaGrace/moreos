@@ -11,6 +11,7 @@ int main(int argc, char *argv[]){
   a = *pi;
   pi = NULL;
   b = *pi;
+  print(b);
 
   printf(1, "Null Pointer value: %p\n", *pi);
   exit();
