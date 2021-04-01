@@ -8,5 +8,8 @@ int main(int argc, char *argv[]){
   int value = *pointer; /* Dereferencing happens here */
 
   printf(1, "Null Pointer value: %p\n", *pointer);
+
+  value = 5;
+  printf(1, "printing value: %d\n", value);
   exit();
 }
