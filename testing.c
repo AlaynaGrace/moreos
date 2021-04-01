@@ -4,15 +4,9 @@
 #define NULL ((void *)0)
 
 int main(int argc, char *argv[]){
-  int a = 5;
-  int b = 6;
-  int *pi;
-  pi = &a;
-  a = *pi;
-  pi = NULL;
-  b = *pi;
-  printf(1, "B = %d", b);
+  int * pointer = NULL;
+  int value = *pointer; /* Dereferencing happens here */
 
-  printf(1, "Null Pointer value: %p\n", *pi);
+  printf(1, "Null Pointer value: %p\n", *pointer);
   exit();
 }
