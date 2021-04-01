@@ -3,15 +3,15 @@
 #include "user.h"
 #define NULL ((void *)0)
 
-int main(int argc, char *argv[]) {
+int main(int argc, char *argv[]){
   int a, b;
-  int *p;
+  int *pi;
   a = 5;
-  p = &a;
-  a = *p;
-  p = NULL;
-  b = *p;
+  pi = &a;
+  a = *pi;
+  pi = NULL;
+  b = *pi;
 
-  printf(1, "Null Pointer value: %p\n", *p);
+  printf(1, "Null Pointer value: %p\n", *pi);
   exit();
 }
