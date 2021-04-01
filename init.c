@@ -11,17 +11,18 @@ int
 main(void)
 {
   int pid, wpid;
-
+  //int i=0;
   if(open("console", O_RDWR) < 0){
     mknod("console", 1, 1);
     open("console", O_RDWR);
   }
   dup(0);  // stdout
   dup(0);  // stderr
-
+  //printf(1,"i=%d",i);
   for(;;){
     printf(1, "init: starting sh\n");
     pid = fork();
+    //printf(1, "pid = %d\n",pid);
     if(pid < 0){
       printf(1, "init: fork failed\n");
       exit();
