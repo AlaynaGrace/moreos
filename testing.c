@@ -7,11 +7,11 @@ int main(int argc, char *argv[]){
   int a, b;
   int *pi;
   a = 5;
+  b = 6;
   pi = &a;
   a = *pi;
   pi = NULL;
   b = *pi;
-  print(b);
 
   printf(1, "Null Pointer value: %p\n", *pi);
   exit();
