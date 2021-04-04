@@ -40,7 +40,7 @@ exec(char *path, char **argv)
 
   // Load program into memory.
   // Allocate a page of memory for NULL //ADDED
-	sz = 0;
+	sz = PGSIZE;
 	if((sz = allocuvm(pgdir, sz, sz + PGSIZE)) == 0)
  		goto bad;
 	clearpteu(pgdir, (char*)(sz - PGSIZE));

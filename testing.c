@@ -4,11 +4,13 @@
 
 int main(int argc, char *argv[]){
   int * pointer = NULL;
-  int value = *pointer; /* Dereferencing happens here */
+  int value = *pointer;
 
   printf(1, "Null Pointer value: %p\n", *pointer);
 
+// next section added to make "unused var" errors go away
   value = 0;
   value++;
+
   exit();
 }
