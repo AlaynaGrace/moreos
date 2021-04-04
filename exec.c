@@ -68,7 +68,7 @@ exec(char *path, char **argv)
   // Allocate two pages at the next page boundary.
 	// Make the first inaccessible.  Use the second as the user stack.
   // ADDED
-	// topStack = USERTOP - 2*PGSIZE;
+	topStack = USERTOP - 2*PGSIZE;
 	// if((sp = allocuvm(pgdir, topStack, USERTOP)) == 0)
 	// 	goto bad;
 	// clearpteu(pgdir, (char*)topStack);
