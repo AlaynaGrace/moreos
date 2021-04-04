@@ -430,9 +430,9 @@ int growstack(pde_t *pgdir, uint sp, uint topStack) //, struct proc *p)
 	if(allocuvm(pgdir, newTop, topStack) == 0)	
 		return -1;
 
-	p->topStack = p->topStack - PGSIZE;
-	setpteu(p->pgdir, (char *)(p->topStack + PGSIZE));
-	clearpteu(p->pgdir, (char *)p->topStack);
+	proc->topStack = proc->topStack - PGSIZE;
+	setpteu(proc->pgdir, (char *)(proc->topStack + PGSIZE));
+	clearpteu(proc->pgdir, (char *)proc->topStack);
 	return 0;
 }
 
