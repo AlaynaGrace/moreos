@@ -78,12 +78,12 @@ trap(struct trapframe *tf)
     lapiceoi();
     break;
   case T_PGFLT:
-		if(growstack(myproc()->pgdir, myproc()->tf->esp, myproc()->topStack, myproc()) == 0)
+		if(growstack(myproc()->pgdir, myproc()->tf->esp, myproc()->top_of_stack, myproc()) == 0)
 			break;
 		cprintf("pid %d %s: page fault on %d eip 0x%x ",myproc()->pid, myproc()->name, mycpu()->apicid, tf->eip);
-		cprintf("stack 0x%x sz 0x%x addr 0x%x\n", myproc()->topStack, myproc()->sz, rcr2());
+		cprintf("stack 0x%x sz 0x%x addr 0x%x\n", myproc()->top_of_stack, myproc()->sz, rcr2());
 		if(myproc()->tf->esp > myproc()->sz)
-			deallocuvm(myproc()->pgdir, USERTOP, myproc()->topStack);
+			deallocuvm(myproc()->pgdir, USERTOP, myproc()->top_of_stack);
 
 		myproc()->killed = 1;
 		break;

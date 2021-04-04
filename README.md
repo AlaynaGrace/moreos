@@ -14,9 +14,9 @@ To do this, I made the following changes:
 * Added a new function in `vm.c` that would help grow the stack
 * Added a page fault case to `trap.c`
 * Added limits in `syscall.c` so that the current proccess address couldn't go over `USERTOP`
-* Add `topStack` to the proc struct in `proc.h`
-* In `proc.c`, added logic so that the top stack for the first user process is set to 0 and all forked processes copy the process state from the proc attribute `topStack`
-* In `exec.c`, added code to add two pages at the next boundary, the first one being inacessible and the second one as the user stack, and sets the proc topStack.
+* Add `top_of_stack` to the proc struct in `proc.h`
+* In `proc.c`, added logic so that the top stack for the first user process is set to 0 and all forked processes copy the process state from the proc attribute `top_of_stack`
+* In `exec.c`, added code to add two pages at the next boundary, the first one being inacessible and the second one as the user stack, and sets the proc top_of_stack.
 
 I was able to run the `testing.c` script again and see that it ran into a page fault error:
 ```
