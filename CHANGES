@@ -1,0 +1,62 @@
+// CHANGES to XV6 for Lab 2
+
+Part 1: Memory Translation System Call
+
+proc.c
+	Function added called v2p which translate the virtual address into the physical address
+	Lines: 413-427
+
+syscall.c
+	system call declaration added for v2p
+	Lines: 71, 116
+
+sysproc.c
+	system call function added for v2p
+	Lines: 70-76
+
+defs.h
+	function declaration for v2p in proc.c file
+	Lines: 122
+	
+syscall.h
+	defining the syscall call declaration for v2p
+	Lines: 23
+
+Part 2: Null Pointer Dereference
+
+Makefile
+	On line 136 and line 143 changed the starting page of forktest and _% to 0x1000 instead of 0
+	
+exec.c
+	Allocated a page of memory for NULL
+	Lines: 36-40
+
+Part 3: Stack Rearrangement
+
+exec.c
+	Define a variable topStack to use inside exec function. Then we allocated two pages at the next boundary with the first inacessible and the second as the user stack. set the process top stack as the variable top stack.
+	Lines: 14, 59-64, 93
+
+memlayout.h
+	Define USERTOP variable for operating system
+	Lines: 2
+
+proc.c
+	When initializing the first user process, set the process top stack to 0. When forking the process, we copy the process state from p into the new process with the new variable proc->topStack.
+	Lines: 78, 122, 129
+	
+syscall.c	
+	Made sure that the address of the current process did not go over the USERTOP threshold.
+	Lines: 19, 31, 34
+
+trap.c
+	Added the Page fault case for when the operating system has a page fault and kills the process
+	Lines: 71-80
+
+vm.c
+	So we needed to grow the stack, so we created a function for that specific ability
+	Lines: 334-355
+
+	When we need to copy memory for a child process, we add code to the copyuvm function
+	Lines: 312-329
+	
