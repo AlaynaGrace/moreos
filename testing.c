@@ -1,5 +1,5 @@
 #include "user.h"
-#define NULL ((void *)0)
+#define NULL (0)
 
 int main(int argc, char *argv[]){
   int * pointer = NULL;
