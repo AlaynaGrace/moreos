@@ -50,9 +50,9 @@ exec(char *path, char **argv)
   ip = 0;
 
   //   Allocate a one-page stack at the next page boundary
-  sz = PGROUNDUP(sz);
-  if((sz = allocuvm(pgdir, sz, sz + PGSIZE)) == 0)
-     goto bad;
+  // sz = PGROUNDUP(sz);
+  // if((sz = allocuvm(pgdir, sz, sz + PGSIZE)) == 0)
+  //    goto bad;
 
   uint new_sp = allocuvm(pgdir, USERTOP - PGSIZE, USERTOP);
     if(new_sp == 0)
