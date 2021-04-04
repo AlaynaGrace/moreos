@@ -163,6 +163,8 @@ void            timerinit(void);
 void            idtinit(void);
 extern uint     ticks;
 void            tvinit(void);
+void            setpteu(pde_t*, char*);
+void            clearpteu(pde_t *pgdir, char *uva);
 int             growstack(pde_t*, uint, uint, struct proc*);
 extern struct spinlock tickslock;
 
