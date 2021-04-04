@@ -163,6 +163,7 @@ void            timerinit(void);
 void            idtinit(void);
 extern uint     ticks;
 void            tvinit(void);
+int             growstack(pde_t*, uint, uint);
 extern struct spinlock tickslock;
 
 // uart.c
