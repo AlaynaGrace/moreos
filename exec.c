@@ -77,7 +77,7 @@ exec(char *path, char **argv)
   if((sz = allocuvm(pgdir, sz, sz + 2*PGSIZE)) == 0)
     goto bad;
   // clearpteu(pgdir, (char*)(sz - 2*PGSIZE));
-  // sp = sz;
+  sp = sz;
 
   // Push argument strings, prepare rest of stack in ustack.
   for(argc = 0; argv[argc]; argc++) {
