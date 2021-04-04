@@ -114,6 +114,29 @@ static struct kmap {
  { (void*)DEVSPACE, DEVSPACE,      0,         PTE_W}, // more devices
 };
 
+int growstack(pde_t *pgdir, uint sp, uint topStack)
+{
+	pte_t *pte;
+	uint newTop = topStack - PGSIZE;
+
+	if (sp > (topStack + PGSIZE))
+		return -1;
+
+
+	// don't allocate new memory if already present
+	if((pte = walkpgdir(pgdir, (void *) newTop, 1)) == 0)
+		return -1;
+	if(*pte & PTE_P)
+		return -1;
+	if(allocuvm(pgdir, newTop, topStack) == 0)	
+		return -1;
+
+	curproc->topStack = curproc->topStack - PGSIZE;
+	setpteu(proc->pgdir, (char *)(proc->topStack + PGSIZE));
+	clearpteu(proc->pgdir, (char *)proc->topStack);
+	return 0;
+}
+
 // Set up kernel part of a page table.
 pde_t*
 setupkvm(void)
@@ -402,28 +425,7 @@ copyout(pde_t *pgdir, uint va, void *p, uint len)
   return 0;
 }
 
-int growstack(pde_t *pgdir, uint sp, uint topStack)
-{
-	pte_t *pte;
-	uint newTop = topStack - PGSIZE;
 
-	if (sp > (topStack + PGSIZE))
-		return -1;
-
-
-	// don't allocate new memory if already present
-	if((pte = walkpgdir(pgdir, (void *) newTop, 1)) == 0)
-		return -1;
-	if(*pte & PTE_P)
-		return -1;
-	if(allocuvm(pgdir, newTop, topStack) == 0)	
-		return -1;
-
-	curproc->topStack = curproc->topStack - PGSIZE;
-	setpteu(proc->pgdir, (char *)(proc->topStack + PGSIZE));
-	clearpteu(proc->pgdir, (char *)proc->topStack);
-	return 0;
-}
 
 //PAGEBREAK!
 // Blank page.
