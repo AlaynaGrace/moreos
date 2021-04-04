@@ -8,7 +8,7 @@ struct rtcdate;
 struct spinlock;
 struct stat;
 struct superblock;
-struct ticketlock;
+struct sleeplock;
 
 // bio.c
 void            binit(void);
@@ -119,7 +119,6 @@ void            userinit(void);
 int             wait(void);
 void            wakeup(void*);
 void            yield(void);
-int				v2p(int*, int*);
 
 // swtch.S
 void            swtch(struct context**, struct context*);
@@ -132,6 +131,12 @@ void            initlock(struct spinlock*, char*);
 void            release(struct spinlock*);
 void            pushcli(void);
 void            popcli(void);
+
+// sleeplock.c
+void            acquiresleep(struct sleeplock*);
+void            releasesleep(struct sleeplock*);
+int             holdingsleep(struct sleeplock*);
+void            initsleeplock(struct sleeplock*, char*);
 
 // string.c
 int             memcmp(const void*, const void*, uint);
@@ -167,7 +172,6 @@ void            uartputc(int);
 // vm.c
 void            seginit(void);
 void            kvmalloc(void);
-void            vmenable(void);
 pde_t*          setupkvm(void);
 char*           uva2ka(pde_t*, char*);
 int             allocuvm(pde_t*, uint, uint);
