@@ -81,9 +81,9 @@ argint(int n, int *ip)
 int
 argptr(int n, char **pp, int size)
 {
-  int i;
+  // int i;
   
-  if(i <= proc->stack_addr ) {
+  if(n <= proc->stack_addr ) {
   	 cprintf("accessing addr = %d\n",i);
    }
 
