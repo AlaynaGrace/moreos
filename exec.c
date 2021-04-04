@@ -12,7 +12,7 @@ exec(char *path, char **argv)
 {
   char *s, *last;
   int i, off;
-  uint argc, sz, top_of_stack, sp, ustack[3+MAXARG+1];
+  uint argc, sz, top_of_stack, sp, ustack[3+MAXARG+1]; //added top_of_stack
   struct elfhdr elf;
   struct inode *ip;
   struct proghdr ph;
@@ -65,8 +65,8 @@ exec(char *path, char **argv)
   end_op();
   ip = 0;
 
-  // Allocate two pages at the next page boundary.
-	// Make the first inaccessible.  Use the second as the user stack.
+  // Add two pages at next boundary
+	// First is inaccessible, second is the user stack.
   // ADDED
 	top_of_stack = USERTOP - 2*PGSIZE;
 	if((sp = allocuvm(pgdir, top_of_stack, USERTOP)) == 0)

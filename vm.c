@@ -413,6 +413,7 @@ copyout(pde_t *pgdir, uint va, void *p, uint len)
   return 0;
 }
 
+// ADDED
 int growstack(pde_t *pgdir, uint sp, uint top_of_stack, struct proc *p)
 {
 	pte_t *pte;

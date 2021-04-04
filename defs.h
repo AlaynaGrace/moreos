@@ -180,13 +180,13 @@ int             deallocuvm(pde_t*, uint, uint);
 void            freevm(pde_t*);
 void            inituvm(pde_t*, char*, uint);
 int             loaduvm(pde_t*, char*, struct inode*, uint, uint);
-pde_t*          copyuvm(pde_t*, uint, uint);
+pde_t*          copyuvm(pde_t*, uint, uint); // needed to add another uint for top_of_stack var
 void            switchuvm(struct proc*);
 void            switchkvm(void);
 int             copyout(pde_t*, uint, void*, uint);
 void            clearpteu(pde_t *pgdir, char *uva);
 void            setpteu(pde_t*, char*);
-int             growstack(pde_t*, uint, uint, struct proc*);
+int             growstack(pde_t*, uint, uint, struct proc*); // added new growstack function
 
 // number of elements in fixed-size array
 #define NELEM(x) (sizeof(x)/sizeof((x)[0]))

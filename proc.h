@@ -37,7 +37,7 @@ enum procstate { UNUSED, EMBRYO, SLEEPING, RUNNABLE, RUNNING, ZOMBIE };
 // Per-process state
 struct proc {
 	uint sz;						// Size of process memory (bytes)
-	uint top_of_stack;					// Current position for the top of the stack
+	uint top_of_stack;				// Top of stack position
 	pde_t* pgdir;					// Page table
 	char *kstack;					// Bottom of kernel stack for this process
 	char name[16];					// Process name (debugging)
