@@ -17,20 +17,14 @@ exec(char *path, char **argv)
   struct inode *ip;
   struct proghdr ph;
   pde_t *pgdir, *oldpgdir;
-  struct proc *curproc = myproc();
 
-  begin_op();
-
-  if((ip = namei(path)) == 0){
-    end_op();
-    cprintf("exec: fail\n");
+  if((ip = namei(path)) == 0)
     return -1;
-  }
   ilock(ip);
   pgdir = 0;
 
   // Check ELF header
-  if(readi(ip, (char*)&elf, 0, sizeof(elf)) != sizeof(elf))
+  if(readi(ip, (char*)&elf, 0, sizeof(elf)) < sizeof(elf))
     goto bad;
   if(elf.magic != ELF_MAGIC)
     goto bad;
@@ -47,38 +41,35 @@ exec(char *path, char **argv)
       continue;
     if(ph.memsz < ph.filesz)
       goto bad;
-    if(ph.vaddr + ph.memsz < ph.vaddr)
-      goto bad;
     if((sz = allocuvm(pgdir, sz, ph.vaddr + ph.memsz)) == 0)
-      goto bad;
-    if(ph.vaddr % PGSIZE != 0)
       goto bad;
     if(loaduvm(pgdir, (char*)ph.vaddr, ip, ph.off, ph.filesz) < 0)
       goto bad;
   }
   iunlockput(ip);
-  end_op();
   ip = 0;
 
-  // Allocate two pages at the next page boundary.
-  // Make the first inaccessible.  Use the second as the user stack.
+  //   Allocate a one-page stack at the next page boundary
   sz = PGROUNDUP(sz);
-  if((sz = allocuvm(pgdir, sz, sz + 2*PGSIZE)) == 0)
-    goto bad;
-  clearpteu(pgdir, (char*)(sz - 2*PGSIZE));
-  sp = sz;
+  if((sz = allocuvm(pgdir, sz, sz + PGSIZE)) == 0)
+     goto bad;
+
+  uint new_sp = allocuvm(pgdir, USERTOP - PGSIZE, USERTOP);
+    if(new_sp == 0)
+    	panic("panic newsp failed");
 
   // Push argument strings, prepare rest of stack in ustack.
+  sp = new_sp;
   for(argc = 0; argv[argc]; argc++) {
     if(argc >= MAXARG)
       goto bad;
-    sp = (sp - (strlen(argv[argc]) + 1)) & ~3;
+    sp -= strlen(argv[argc]) + 1;
+    sp &= ~3;
     if(copyout(pgdir, sp, argv[argc], strlen(argv[argc]) + 1) < 0)
       goto bad;
     ustack[3+argc] = sp;
   }
   ustack[3+argc] = 0;
-
   ustack[0] = 0xffffffff;  // fake return PC
   ustack[1] = argc;
   ustack[2] = sp - (argc+1)*4;  // argv pointer
@@ -91,24 +82,25 @@ exec(char *path, char **argv)
   for(last=s=path; *s; s++)
     if(*s == '/')
       last = s+1;
-  safestrcpy(curproc->name, last, sizeof(curproc->name));
+  safestrcpy(proc->name, last, sizeof(proc->name));
 
   // Commit to the user image.
-  oldpgdir = curproc->pgdir;
-  curproc->pgdir = pgdir;
-  curproc->sz = sz;
-  curproc->tf->eip = elf.entry;  // main
-  curproc->tf->esp = sp;
-  switchuvm(curproc);
+  oldpgdir = proc->pgdir;
+  proc->pgdir = pgdir;
+  proc->sz = sz;
+  proc->tf->eip = elf.entry;  // main
+  proc->tf->esp = sp;
+  proc->stack_addr = USERTOP - PGSIZE;//this should be updated when stack grows
+//  cprintf("old stack addr = %d stack addr = %d\n",sp,new_sp);
+  switchuvm(proc);
   freevm(oldpgdir);
+
   return 0;
 
  bad:
   if(pgdir)
     freevm(pgdir);
-  if(ip){
+  if(ip)
     iunlockput(ip);
-    end_op();
-  }
   return -1;
 }
