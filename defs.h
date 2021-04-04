@@ -163,7 +163,7 @@ void            timerinit(void);
 void            idtinit(void);
 extern uint     ticks;
 void            tvinit(void);
-int             growstack(pde_t*, uint, uint, struct proc*);
+// int             growstack(pde_t*, uint, uint, struct proc*);
 extern struct spinlock tickslock;
 
 // uart.c
@@ -174,7 +174,6 @@ void            uartputc(int);
 // vm.c
 void            seginit(void);
 void            kvmalloc(void);
-void            vmenable(void);
 pde_t*          setupkvm(void);
 char*           uva2ka(pde_t*, char*);
 int             allocuvm(pde_t*, uint, uint);
