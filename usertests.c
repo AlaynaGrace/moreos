@@ -8,14 +8,11 @@
 #include "traps.h"
 #include "memlayout.h"
 
-char buf[8192];
-char name[3];
+char buf[8192], name[3];
 char *echoargv[] = { "echo", "ALL", "TESTS", "PASSED", 0 };
 int stdout = 1;
 
-// does chdir() call iput(p->cwd) in a transaction?
-void
-iputtest(void)
+void iputtest(void)
 {
   printf(stdout, "iput test\n");
 
@@ -37,10 +34,7 @@ iputtest(void)
   }
   printf(stdout, "iput test ok\n");
 }
-
-// does exit() call iput(p->cwd) in a transaction?
-void
-exitiputtest(void)
+void exitiputtest(void)
 {
   int pid;
 
@@ -69,20 +63,7 @@ exitiputtest(void)
   wait();
   printf(stdout, "exitiput test ok\n");
 }
-
-// does the error path in open() for attempt to write a
-// directory call iput() in a transaction?
-// needs a hacked kernel that pauses just after the namei()
-// call in sys_open():
-//    if((ip = namei(path)) == 0)
-//      return -1;
-//    {
-//      int i;
-//      for(i = 0; i < 10000; i++)
-//        yield();
-//    }
-void
-openiputtest(void)
+void openiputtest(void)
 {
   int pid;
 
@@ -112,11 +93,7 @@ openiputtest(void)
   wait();
   printf(stdout, "openiput test ok\n");
 }
-
-// simple file system tests
-
-void
-opentest(void)
+void opentest(void)
 {
   int fd;
 
@@ -134,9 +111,7 @@ opentest(void)
   }
   printf(stdout, "open test ok\n");
 }
-
-void
-writetest(void)
+void writetest(void)
 {
   int fd;
   int i;
@@ -179,13 +154,11 @@ writetest(void)
 
   if(unlink("small") < 0){
     printf(stdout, "unlink small failed\n");
-    exit();
+    exit(0);
   }
   printf(stdout, "small file test ok\n");
 }
-
-void
-writetest1(void)
+void writetest1(void)
 {
   int i, fd, n;
 
@@ -240,9 +213,7 @@ writetest1(void)
   }
   printf(stdout, "big files ok\n");
 }
-
-void
-createtest(void)
+void createtest(void)
 {
   int i, fd;
 
@@ -263,7 +234,6 @@ createtest(void)
   }
   printf(stdout, "many creates, followed by unlink; ok\n");
 }
-
 void dirtest(void)
 {
   printf(stdout, "mkdir test\n");
@@ -289,9 +259,7 @@ void dirtest(void)
   }
   printf(stdout, "mkdir test ok\n");
 }
-
-void
-exectest(void)
+void exectest(void)
 {
   printf(stdout, "exec test\n");
   if(exec("echo", echoargv) < 0){
@@ -299,11 +267,7 @@ exectest(void)
     exit();
   }
 }
-
-// simple fork and pipe read/write
-
-void
-pipe1(void)
+void pipe1(void)
 {
   int fds[2], pid;
   int seq, i, n, cc, total;
@@ -353,10 +317,7 @@ pipe1(void)
   }
   printf(1, "pipe1 ok\n");
 }
-
-// meant to be run w/ at most two CPUs
-void
-preempt(void)
+void preempt(void)
 {
   int pid1, pid2, pid3;
   int pfds[2];
@@ -364,13 +325,11 @@ preempt(void)
   printf(1, "preempt: ");
   pid1 = fork();
   if(pid1 == 0)
-    for(;;)
-      ;
+    for(;;);
 
   pid2 = fork();
   if(pid2 == 0)
-    for(;;)
-      ;
+    for(;;);
 
   pipe(pfds);
   pid3 = fork();
@@ -379,8 +338,7 @@ preempt(void)
     if(write(pfds[1], "x", 1) != 1)
       printf(1, "preempt write error");
     close(pfds[1]);
-    for(;;)
-      ;
+    for(;;);
   }
 
   close(pfds[1]);
@@ -399,10 +357,7 @@ preempt(void)
   wait();
   printf(1, "preempt ok\n");
 }
-
-// try to find any races between exit and wait
-void
-exitwait(void)
+void exitwait(void)
 {
   int i, pid;
 
@@ -423,9 +378,7 @@ exitwait(void)
   }
   printf(1, "exitwait ok\n");
 }
-
-void
-mem(void)
+void mem(void)
 {
   void *m1, *m2;
   int pid, ppid;
@@ -456,13 +409,7 @@ mem(void)
     wait();
   }
 }
-
-// More file system tests
-
-// two processes write to the same file descriptor
-// is the offset shared? does inode locking work?
-void
-sharedfd(void)
+void sharedfd(void)
 {
   int fd, pid, i, n, nc, np;
   char buf[10];
@@ -508,14 +455,10 @@ sharedfd(void)
     printf(1, "sharedfd ok\n");
   } else {
     printf(1, "sharedfd oops %d %d\n", nc, np);
-    exit();
+    exit(0);
   }
 }
-
-// four processes write different files at the same
-// time, to test block allocation.
-void
-fourfiles(void)
+void fourfiles(void)
 {
   int fd, pid, i, j, n, total, pi;
   char *names[] = { "f0", "f1", "f2", "f3" };
@@ -539,7 +482,7 @@ fourfiles(void)
         printf(1, "create failed\n");
         exit();
       }
-
+      
       memset(buf, '0'+pi, 512);
       for(i = 0; i < 12; i++){
         if((n = write(fd, buf, 500)) != 500){
@@ -578,10 +521,7 @@ fourfiles(void)
 
   printf(1, "fourfiles ok\n");
 }
-
-// four processes create and delete different files in same directory
-void
-createdelete(void)
+void createdelete(void)
 {
   enum { N = 20 };
   int pid, i, fd, pi;
@@ -652,9 +592,7 @@ createdelete(void)
   printf(1, "createdelete ok\n");
 }
 
-// can I unlink a file and still read it?
-void
-unlinkread(void)
+void unlinkread(void)
 {
   int fd, fd1;
 
@@ -697,9 +635,7 @@ unlinkread(void)
   unlink("unlinkread");
   printf(1, "unlinkread ok\n");
 }
-
-void
-linktest(void)
+void linktest(void)
 {
   int fd;
 
@@ -759,14 +695,10 @@ linktest(void)
 
   printf(1, "linktest ok\n");
 }
-
-// test concurrent create/link/unlink of the same file
-void
-concreate(void)
+void concreate(void)
 {
-  char file[3];
+  char file[3], fa[40];
   int i, pid, n, fd;
-  char fa[40];
   struct {
     ushort inum;
     char name[14];
@@ -851,11 +783,7 @@ concreate(void)
 
   printf(1, "concreate ok\n");
 }
-
-// another concurrent link/unlink/create test,
-// to look for deadlocks.
-void
-linkunlink()
+void linkunlink()
 {
   int pid, i;
 
@@ -882,15 +810,12 @@ linkunlink()
 
   if(pid)
     wait();
-  else
+  else 
     exit();
 
   printf(1, "linkunlink ok\n");
 }
-
-// directory that uses indirect blocks
-void
-bigdir(void)
+void bigdir(void)
 {
   int i, fd;
   char name[10];
@@ -930,9 +855,7 @@ bigdir(void)
 
   printf(1, "bigdir ok\n");
 }
-
-void
-subdir(void)
+void subdir(void)
 {
   int fd, cc;
 
@@ -951,7 +874,7 @@ subdir(void)
   }
   write(fd, "ff", 2);
   close(fd);
-
+  
   if(unlink("dd") >= 0){
     printf(1, "unlink dd (non-empty dir) succeeded!\n");
     exit();
@@ -1113,10 +1036,7 @@ subdir(void)
 
   printf(1, "subdir ok\n");
 }
-
-// test writes that are larger than the log.
-void
-bigwrite(void)
+void bigwrite(void)
 {
   int fd, sz;
 
@@ -1143,9 +1063,7 @@ bigwrite(void)
 
   printf(1, "bigwrite ok\n");
 }
-
-void
-bigfile(void)
+void bigfile(void)
 {
   int fd, i, total, cc;
 
@@ -1199,9 +1117,7 @@ bigfile(void)
 
   printf(1, "bigfile test ok\n");
 }
-
-void
-fourteen(void)
+void fourteen(void)
 {
   int fd;
 
@@ -1240,9 +1156,7 @@ fourteen(void)
 
   printf(1, "fourteen ok\n");
 }
-
-void
-rmdot(void)
+void rmdot(void)
 {
   printf(1, "rmdot test\n");
   if(mkdir("dots") != 0){
@@ -1279,9 +1193,7 @@ rmdot(void)
   }
   printf(1, "rmdot ok\n");
 }
-
-void
-dirfile(void)
+void dirfile(void)
 {
   int fd;
 
@@ -1339,15 +1251,12 @@ dirfile(void)
   printf(1, "dir vs file OK\n");
 }
 
-// test that iput() is called at the end of _namei()
-void
-iref(void)
+void iref(void)
 {
   int i, fd;
 
   printf(1, "empty file name\n");
 
-  // the 50 is NINODE
   for(i = 0; i < 50 + 1; i++){
     if(mkdir("irefd") != 0){
       printf(1, "mkdir irefd failed\n");
@@ -1372,12 +1281,7 @@ iref(void)
   chdir("/");
   printf(1, "empty file name OK\n");
 }
-
-// test that fork fails gracefully
-// the forktest binary also does this, but it runs out of proc entries first.
-// inside the bigger usertests binary, we run out of memory first.
-void
-forktest(void)
+void forktest(void)
 {
   int n, pid;
 
@@ -1390,29 +1294,27 @@ forktest(void)
     if(pid == 0)
       exit();
   }
-
+  
   if(n == 1000){
     printf(1, "fork claimed to work 1000 times!\n");
     exit();
   }
-
+  
   for(; n > 0; n--){
     if(wait() < 0){
       printf(1, "wait stopped early\n");
       exit();
     }
   }
-
+  
   if(wait() != -1){
     printf(1, "wait got too many\n");
     exit();
   }
-
+  
   printf(1, "fork test OK\n");
 }
-
-void
-sbrktest(void)
+void sbrktest(void)
 {
   int fds[2], pid, pids[10], ppid;
   char *a, *b, *c, *lastaddr, *oldbrk, *p, scratch;
@@ -1421,10 +1323,9 @@ sbrktest(void)
   printf(stdout, "sbrk test\n");
   oldbrk = sbrk(0);
 
-  // can one sbrk() less than a page?
   a = sbrk(0);
   int i;
-  for(i = 0; i < 5000; i++){
+  for(i = 0; i < 5000; i++){ 
     b = sbrk(1);
     if(b != a){
       printf(stdout, "sbrk test failed %d %x %x\n", i, a, b);
@@ -1448,19 +1349,17 @@ sbrktest(void)
     exit();
   wait();
 
-  // can one grow address space to something big?
 #define BIG (100*1024*1024)
   a = sbrk(0);
   amt = (BIG) - (uint)a;
   p = sbrk(amt);
-  if (p != a) {
+  if (p != a) { 
     printf(stdout, "sbrk test failed to grow big address space; enough phys mem?\n");
     exit();
   }
   lastaddr = (char*) (BIG-1);
   *lastaddr = 99;
 
-  // can one de-allocate?
   a = sbrk(0);
   c = sbrk(-4096);
   if(c == (char*)0xffffffff){
@@ -1492,7 +1391,7 @@ sbrktest(void)
     printf(stdout, "sbrk downsize failed, a %x c %x\n", a, c);
     exit();
   }
-
+  
   // can we read the kernel's memory?
   for(a = (char*)(KERNBASE); a < (char*) (KERNBASE+2000000); a += 50000){
     ppid = getpid();
@@ -1508,26 +1407,19 @@ sbrktest(void)
     }
     wait();
   }
-
-  // if we run the system out of memory, does it clean up the last
-  // failed allocation?
   if(pipe(fds) != 0){
     printf(1, "pipe() failed\n");
     exit();
   }
   for(i = 0; i < sizeof(pids)/sizeof(pids[0]); i++){
     if((pids[i] = fork()) == 0){
-      // allocate a lot of memory
       sbrk(BIG - (uint)sbrk(0));
       write(fds[1], "x", 1);
-      // sit around until killed
       for(;;) sleep(1000);
     }
     if(pids[i] != -1)
       read(fds[0], &scratch, 1);
   }
-  // if those failed allocations freed up the pages they did allocate,
-  // we'll be able to allocate here
   c = sbrk(4096);
   for(i = 0; i < sizeof(pids)/sizeof(pids[0]); i++){
     if(pids[i] == -1)
@@ -1545,9 +1437,7 @@ sbrktest(void)
 
   printf(stdout, "sbrk test OK\n");
 }
-
-void
-validateint(int *p)
+void validateint(int *p)
 {
   int res;
   asm("mov %%esp, %%ebx\n\t"
@@ -1558,9 +1448,7 @@ validateint(int *p)
       "a" (SYS_sleep), "n" (T_SYSCALL), "c" (p) :
       "ebx");
 }
-
-void
-validatetest(void)
+void validatetest(void)
 {
   int hi, pid;
   uint p;
@@ -1570,7 +1458,6 @@ validatetest(void)
 
   for(p = 0; p <= (uint)hi; p += 4096){
     if((pid = fork()) == 0){
-      // try to crash the kernel by passing in a badly placed integer
       validateint((int*)p);
       exit();
     }
@@ -1579,7 +1466,6 @@ validatetest(void)
     kill(pid);
     wait();
 
-    // try to crash the kernel by passing in a bad string pointer
     if(link("nosuchfile", (char*)p) != -1){
       printf(stdout, "link should not succeed\n");
       exit();
@@ -1588,11 +1474,8 @@ validatetest(void)
 
   printf(stdout, "validate ok\n");
 }
-
-// does unintialized data start out zero?
 char uninit[10000];
-void
-bsstest(void)
+void bsstest(void)
 {
   int i;
 
@@ -1605,12 +1488,7 @@ bsstest(void)
   }
   printf(stdout, "bss test ok\n");
 }
-
-// does exec return an error if the arguments
-// are larger than a page? or does it write
-// below the stack and wreck the instructions/data?
-void
-bigargtest(void)
+void bigargtest(void)
 {
   int pid, fd;
 
@@ -1641,11 +1519,7 @@ bigargtest(void)
   close(fd);
   unlink("bigarg-ok");
 }
-
-// what happens when the file system runs out of blocks?
-// answer: balloc panics, so this test is not useful.
-void
-fsfull()
+void fsfull()
 {
   int nfiles;
   int fsblocks = 0;
@@ -1694,59 +1568,13 @@ fsfull()
 
   printf(1, "fsfull test finished\n");
 }
-
-void
-uio()
-{
-  #define RTC_ADDR 0x70
-  #define RTC_DATA 0x71
-
-  ushort port = 0;
-  uchar val = 0;
-  int pid;
-
-  printf(1, "uio test\n");
-  pid = fork();
-  if(pid == 0){
-    port = RTC_ADDR;
-    val = 0x09;  /* year */
-    /* http://wiki.osdev.org/Inline_Assembly/Examples */
-    asm volatile("outb %0,%1"::"a"(val), "d" (port));
-    port = RTC_DATA;
-    asm volatile("inb %1,%0" : "=a" (val) : "d" (port));
-    printf(1, "uio: uio succeeded; test FAILED\n");
-    exit();
-  } else if(pid < 0){
-    printf (1, "fork failed\n");
-    exit();
-  }
-  wait();
-  printf(1, "uio test done\n");
-}
-
-void argptest()
-{
-  int fd;
-  fd = open("init", O_RDONLY);
-  if (fd < 0) {
-    printf(2, "open failed\n");
-    exit();
-  }
-  read(fd, sbrk(0) - 1, -1);
-  close(fd);
-  printf(1, "arg test passed\n");
-}
-
 unsigned long randstate = 1;
-unsigned int
-rand()
+unsigned int rand()
 {
   randstate = randstate * 1664525 + 1013904223;
   return randstate;
 }
-
-int
-main(int argc, char *argv[])
+int main(int argc, char *argv[])
 {
   printf(1, "usertests starting\n");
 
@@ -1756,7 +1584,6 @@ main(int argc, char *argv[])
   }
   close(open("usertests.ran", O_CREATE));
 
-  argptest();
   createdelete();
   linkunlink();
   concreate();
@@ -1794,9 +1621,6 @@ main(int argc, char *argv[])
   iref();
   forktest();
   bigdir(); // slow
-
-  uio();
-
   exectest();
 
   exit();

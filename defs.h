@@ -6,9 +6,9 @@ struct pipe;
 struct proc;
 struct rtcdate;
 struct spinlock;
-struct sleeplock;
 struct stat;
 struct superblock;
+struct ticketlock;
 
 // bio.c
 void            binit(void);
@@ -74,7 +74,7 @@ void            kbdintr(void);
 
 // lapic.c
 void            cmostime(struct rtcdate *r);
-int             lapicid(void);
+int             cpunum(void);
 extern volatile uint*    lapic;
 void            lapiceoi(void);
 void            lapicinit(void);
@@ -89,7 +89,9 @@ void            end_op();
 
 // mp.c
 extern int      ismp;
+int             mpbcpu(void);
 void            mpinit(void);
+void            mpstartthem(void);
 
 // picirq.c
 void            picenable(int);
@@ -101,25 +103,23 @@ void            pipeclose(struct pipe*, int);
 int             piperead(struct pipe*, char*, int);
 int             pipewrite(struct pipe*, char*, int);
 
-//PAGEBREAK: 16
 // proc.c
-int             cpuid(void);
+struct proc*    copyproc(struct proc*);
 void            exit(void);
 int             fork(void);
+void            givepriority(struct proc*);
 int             growproc(int);
 int             kill(int);
-struct cpu*     mycpu(void);
-struct proc*    myproc();
 void            pinit(void);
 void            procdump(void);
 void            scheduler(void) __attribute__((noreturn));
 void            sched(void);
-void            setproc(struct proc*);
 void            sleep(void*, struct spinlock*);
 void            userinit(void);
 int             wait(void);
 void            wakeup(void*);
 void            yield(void);
+int				v2p(int*, int*);
 
 // swtch.S
 void            swtch(struct context**, struct context*);
@@ -132,12 +132,6 @@ void            initlock(struct spinlock*, char*);
 void            release(struct spinlock*);
 void            pushcli(void);
 void            popcli(void);
-
-// sleeplock.c
-void            acquiresleep(struct sleeplock*);
-void            releasesleep(struct sleeplock*);
-int             holdingsleep(struct sleeplock*);
-void            initsleeplock(struct sleeplock*, char*);
 
 // string.c
 int             memcmp(const void*, const void*, uint);
@@ -173,18 +167,21 @@ void            uartputc(int);
 // vm.c
 void            seginit(void);
 void            kvmalloc(void);
+void            vmenable(void);
 pde_t*          setupkvm(void);
 char*           uva2ka(pde_t*, char*);
 int             allocuvm(pde_t*, uint, uint);
+int             growstack(pde_t*, uint, uint);
 int             deallocuvm(pde_t*, uint, uint);
 void            freevm(pde_t*);
 void            inituvm(pde_t*, char*, uint);
 int             loaduvm(pde_t*, char*, struct inode*, uint, uint);
-pde_t*          copyuvm(pde_t*, uint);
+pde_t*          copyuvm(pde_t*, uint, uint);
 void            switchuvm(struct proc*);
 void            switchkvm(void);
 int             copyout(pde_t*, uint, void*, uint);
 void            clearpteu(pde_t *pgdir, char *uva);
+void            setpteu(pde_t*, char*);
 
 // number of elements in fixed-size array
 #define NELEM(x) (sizeof(x)/sizeof((x)[0]))
