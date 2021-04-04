@@ -74,6 +74,7 @@ void            kbdintr(void);
 
 // lapic.c
 void            cmostime(struct rtcdate *r);
+int             lapicid(void);
 int             cpunum(void);
 extern volatile uint*    lapic;
 void            lapiceoi(void);
@@ -104,12 +105,16 @@ int             piperead(struct pipe*, char*, int);
 int             pipewrite(struct pipe*, char*, int);
 
 // proc.c
+int             cpuid(void);
 struct proc*    copyproc(struct proc*);
 void            exit(void);
 int             fork(void);
 void            givepriority(struct proc*);
 int             growproc(int);
 int             kill(int);
+struct cpu*     mycpu(void);
+struct proc*    myproc();
+void            setproc(struct proc*);
 void            pinit(void);
 void            procdump(void);
 void            scheduler(void) __attribute__((noreturn));
