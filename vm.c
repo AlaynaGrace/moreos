@@ -402,7 +402,7 @@ copyout(pde_t *pgdir, uint va, void *p, uint len)
   return 0;
 }
 
-int growstack(pde_t *pgdir, uint sp, uint topStack)
+int growstack(pde_t *pgdir, uint sp, uint topStack, struct proc *p)
 {
 	pte_t *pte;
 	uint newTop = topStack - PGSIZE;
@@ -419,9 +419,9 @@ int growstack(pde_t *pgdir, uint sp, uint topStack)
 	if(allocuvm(pgdir, newTop, topStack) == 0)	
 		return -1;
 
-	proc->topStack = proc->topStack - PGSIZE;
-	setpteu(proc->pgdir, (char *)(proc->topStack + PGSIZE));
-	clearpteu(proc->pgdir, (char *)proc->topStack);
+	p->topStack = p->topStack - PGSIZE;
+	setpteu(p->pgdir, (char *)(p->topStack + PGSIZE));
+	clearpteu(p->pgdir, (char *)p->topStack);
 	return 0;
 }
 
