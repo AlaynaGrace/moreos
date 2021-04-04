@@ -416,18 +416,18 @@ copyout(pde_t *pgdir, uint va, void *p, uint len)
 int growstack(pde_t *pgdir, uint sp, uint top_of_stack, struct proc *p)
 {
 	pte_t *pte;
-	uint newTop = top_of_stack - PGSIZE;
+	uint new_top = top_of_stack - PGSIZE;
 
 	if (sp > (top_of_stack + PGSIZE))
 		return -1;
 
 
-	// don't allocate new memory if already present
-	if((pte = walkpgdir(pgdir, (void *) newTop, 1)) == 0)
+	// only allocate mem if not present
+	if((pte = walkpgdir(pgdir, (void *) new_top, 1)) == 0)
 		return -1;
 	if(*pte & PTE_P)
 		return -1;
-	if(allocuvm(pgdir, newTop, top_of_stack) == 0)	
+	if(allocuvm(pgdir, new_top, top_of_stack) == 0)	
 		return -1;
 
 	p->top_of_stack = p->top_of_stack - PGSIZE;
