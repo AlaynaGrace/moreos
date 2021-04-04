@@ -69,9 +69,9 @@ exec(char *path, char **argv)
 	// Make the first inaccessible.  Use the second as the user stack.
   // ADDED
 	topStack = USERTOP - 2*PGSIZE;
-	// if((sp = allocuvm(pgdir, topStack, USERTOP)) == 0)
-	// 	goto bad;
-	// clearpteu(pgdir, (char*)topStack);
+	if((sp = allocuvm(pgdir, topStack, USERTOP)) == 0)
+		goto bad;
+	clearpteu(pgdir, (char*)topStack);
 
   sz = PGROUNDUP(sz);
   if((sz = allocuvm(pgdir, sz, sz + 2*PGSIZE)) == 0)
