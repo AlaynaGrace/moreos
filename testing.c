@@ -1,9 +1,10 @@
-// #include "user.h"
-#include "types.h"
+#include "user.h"
 #define NULL ((void *)0)
 
 int main(int argc, char *argv[]){
-    char *path = NULL;
-	mkdir(path);
-	exit();
+  int * pointer = NULL;
+  int value = *pointer; /* Dereferencing happens here */
+
+  printf(1, "Null Pointer value: %p\n", *pointer);
+  exit();
 }
