@@ -6,5 +6,8 @@ int main(int argc, char *argv[]){
   int value = *pointer; /* Dereferencing happens here */
 
   printf(1, "Null Pointer value: %p\n", *pointer);
+
+  value = 0;
+  value++;
   exit();
 }
