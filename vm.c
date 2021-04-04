@@ -413,7 +413,7 @@ copyout(pde_t *pgdir, uint va, void *p, uint len)
   return 0;
 }
 
-int growstack(pde_t *pgdir, uint sp, uint topStack, struct proc *p)
+int growstack(pde_t *pgdir, uint sp, uint topStack) //, struct proc *p)
 {
 	pte_t *pte;
 	uint newTop = topStack - PGSIZE;
