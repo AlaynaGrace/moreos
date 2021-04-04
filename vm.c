@@ -337,7 +337,24 @@ copyuvm(pde_t *pgdir, uint sz)
       goto bad;
     }
   }
-  return d;
+  if (stack_top == 0)
+		return d;
+	// copy stack
+	for(i = stack_top; i < USERTOP; i += PGSIZE){
+		if((pte = walkpgdir(pgdir, (void *) i, 1)) == 0)
+			panic("copyuvm: pte should exist");
+  		if(!(*pte & PTE_P))
+			panic("copyuvm: page not present");
+		pa = PTE_ADDR(*pte);
+		flags = PTE_FLAGS(*pte);
+		if((mem = kalloc()) == 0)
+			goto bad;
+		memmove(mem, (char*)P2V(pa), PGSIZE);
+		if(mappages(d, (void*)i, PGSIZE, V2P(mem), flags) < 0)
+			goto bad;
+ 	}
+	return d;
+
 
 bad:
   freevm(d);
@@ -383,6 +400,29 @@ copyout(pde_t *pgdir, uint va, void *p, uint len)
     va = va0 + PGSIZE;
   }
   return 0;
+}
+
+int growstack(pde_t *pgdir, uint sp, uint topStack)
+{
+	pte_t *pte;
+	uint newTop = topStack - PGSIZE;
+
+	if (sp > (topStack + PGSIZE))
+		return -1;
+
+
+	// don't allocate new memory if already present
+	if((pte = walkpgdir(pgdir, (void *) newTop, 1)) == 0)
+		return -1;
+	if(*pte & PTE_P)
+		return -1;
+	if(allocuvm(pgdir, newTop, topStack) == 0)	
+		return -1;
+
+	curproc->topStack = curproc->topStack - PGSIZE;
+	setpteu(proc->pgdir, (char *)(proc->topStack + PGSIZE));
+	clearpteu(proc->pgdir, (char *)proc->topStack);
+	return 0;
 }
 
 //PAGEBREAK!
